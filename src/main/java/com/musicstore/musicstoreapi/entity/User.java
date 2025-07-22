@@ -2,7 +2,11 @@ package com.musicstore.musicstoreapi.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Entity
@@ -12,7 +16,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends AbstractEntity<Long> {
+public class User extends AbstractEntity<Long> implements UserDetails {
     @Column(name = "name")
     private String name;
 
@@ -45,4 +49,17 @@ public class User extends AbstractEntity<Long> {
 
     @OneToOne(mappedBy = "user")
     private Cart cart;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles
+                .stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .toList();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !this.isLock;
+    }
 }
