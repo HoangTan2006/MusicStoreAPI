@@ -1,4 +1,4 @@
-package com.musicstore.musicstoreapi.dto.response;
+package com.musicstore.musicstoreapi.dto.response.authDTO;
 
 import lombok.Builder;
 import lombok.Getter;

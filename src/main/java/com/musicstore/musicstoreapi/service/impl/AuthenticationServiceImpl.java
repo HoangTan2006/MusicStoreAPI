@@ -1,8 +1,8 @@
 package com.musicstore.musicstoreapi.service.impl;
 
-import com.musicstore.musicstoreapi.dto.request.auth.LoginRequest;
-import com.musicstore.musicstoreapi.dto.request.auth.RegisterRequest;
-import com.musicstore.musicstoreapi.dto.response.LoginResponse;
+import com.musicstore.musicstoreapi.dto.request.authDTO.LoginRequest;
+import com.musicstore.musicstoreapi.dto.request.authDTO.RegisterRequest;
+import com.musicstore.musicstoreapi.dto.response.authDTO.LoginResponse;
 import com.musicstore.musicstoreapi.entity.Role;
 import com.musicstore.musicstoreapi.entity.User;
 import com.musicstore.musicstoreapi.entity.enums.RoleType;
@@ -31,11 +31,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
 
     @Override
-    public LoginResponse authenticateUser(LoginRequest request) {
+    public LoginResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
                 )
         );
 
@@ -51,18 +51,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void registerUser(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) throw new UserRegistrationException("Username already exists");
-        if (userRepository.existsByEmail(request.getEmail())) throw new UserRegistrationException("Email already exists");
+    public void registerUser(RegisterRequest registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) throw new UserRegistrationException("Username already exists");
+        if (userRepository.existsByEmail(registerRequest.getEmail())) throw new UserRegistrationException("Email already exists");
 
         Role role = roleRepository.findByName(RoleType.ROLE_USER.name())
                 .orElseThrow(() -> new UserRegistrationException("Role not found"));
 
         User user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .name(registerRequest.getName())
+                .email(registerRequest.getEmail())
+                .username(registerRequest.getUsername())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .roles(Set.of(role))
                 .isLock(false)
                 .build();

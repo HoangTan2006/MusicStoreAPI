@@ -18,6 +18,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
+    private final String[] WHITE_LIST = {
+            "/api/v1/auth/login",
+            "/api/v1/auth/register",
+            "/api/v1/products"
+    };
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -27,7 +33,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(config -> config
-                        .anyRequest().permitAll())
+                        .requestMatchers(WHITE_LIST).permitAll()
+                        .anyRequest().authenticated())
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(AbstractHttpConfigurer::disable);

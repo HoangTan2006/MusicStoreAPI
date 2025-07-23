@@ -1,9 +1,7 @@
 package com.musicstore.musicstoreapi.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
@@ -12,6 +10,8 @@ import java.util.Set;
 @Setter
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product extends AbstractEntity<Integer> {
     @Column(name = "name")
     private String name;
@@ -31,8 +31,8 @@ public class Product extends AbstractEntity<Integer> {
     @Column(name = "sold_quantity")
     private Integer soldQuantity;
 
-    @Column(name = "is_delete")
-    private Boolean isDelete;
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

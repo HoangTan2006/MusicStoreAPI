@@ -1,20 +1,16 @@
 package com.musicstore.musicstoreapi.controller;
 
-import com.musicstore.musicstoreapi.dto.request.auth.LoginRequest;
-import com.musicstore.musicstoreapi.dto.request.auth.RegisterRequest;
+import com.musicstore.musicstoreapi.dto.request.authDTO.LoginRequest;
+import com.musicstore.musicstoreapi.dto.request.authDTO.RegisterRequest;
 import com.musicstore.musicstoreapi.dto.response.ApiResponse;
-import com.musicstore.musicstoreapi.dto.response.LoginResponse;
+import com.musicstore.musicstoreapi.dto.response.authDTO.LoginResponse;
 import com.musicstore.musicstoreapi.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.management.relation.RoleNotFoundException;
 import java.time.Instant;
 
 @RestController
@@ -24,8 +20,9 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<LoginResponse> login(
-            @RequestBody LoginRequest loginRequest,
+            @RequestBody @Valid LoginRequest loginRequest,
             HttpServletRequest httpServletRequest) {
 
         LoginResponse responseData = authenticationService.authenticateUser(loginRequest);
@@ -41,8 +38,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<Void> register(
-            @RequestBody RegisterRequest registerRequest,
+            @RequestBody @Valid RegisterRequest registerRequest,
             HttpServletRequest httpServletRequest) {
 
         authenticationService.registerUser(registerRequest);

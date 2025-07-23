@@ -1,9 +1,7 @@
 package com.musicstore.musicstoreapi.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
@@ -12,6 +10,8 @@ import java.util.Set;
 @Setter
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Cart extends AbstractEntity<Long> {
     @OneToOne
     @JoinColumn(name = "user_id")

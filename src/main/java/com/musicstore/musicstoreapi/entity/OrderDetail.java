@@ -1,15 +1,15 @@
 package com.musicstore.musicstoreapi.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "order_details")
 @Setter
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderDetail extends AbstractEntity<Long> {
     @ManyToOne
     @JoinColumn(name = "order_id")
