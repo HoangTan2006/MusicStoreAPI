@@ -11,5 +11,6 @@ import java.util.List;
 @Builder
 public class ListProductResponse {
     private List<ProductResponse> products;
+    private Integer currentPage;
     private Integer totalPage;
 }

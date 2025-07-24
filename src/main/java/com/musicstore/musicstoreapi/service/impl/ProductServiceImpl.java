@@ -78,12 +78,14 @@ public class ProductServiceImpl implements ProductService {
                         .stream()
                         .map(productMapper::toProductDTO)
                         .toList())
+                .currentPage(page)
                 .totalPage(products.getTotalPages())
                 .build();
     }
 
     @Override
     public void updateProduct(Integer id, ProductUpdateRequest productUpdate) {
+        if (productUpdate.getPrice() == null && productUpdate.getStockQuantity() == null) return;
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
