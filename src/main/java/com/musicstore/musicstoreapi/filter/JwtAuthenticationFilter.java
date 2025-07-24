@@ -37,10 +37,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             String accessToken = authorization.substring(7);
-            Claims parserToken = jwtService.verifyToken(accessToken, TokenType.ACCESS);
+            Claims parserToken = jwtService.parserToken(accessToken, TokenType.ACCESS);
 
-            List<SimpleGrantedAuthority> authorities = parserToken
-                    .get("roles", List.class)
+            List<String> roles = parserToken.get("roles", List.class);
+
+            List<SimpleGrantedAuthority> authorities = roles
                     .stream()
                     .map(role -> new SimpleGrantedAuthority((String) role))
                     .toList();

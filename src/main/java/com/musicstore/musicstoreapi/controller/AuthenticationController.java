@@ -1,8 +1,10 @@
 package com.musicstore.musicstoreapi.controller;
 
 import com.musicstore.musicstoreapi.dto.request.authDTO.LoginRequest;
+import com.musicstore.musicstoreapi.dto.request.authDTO.RefreshTokenRequest;
 import com.musicstore.musicstoreapi.dto.request.authDTO.RegisterRequest;
 import com.musicstore.musicstoreapi.dto.response.ApiResponse;
+import com.musicstore.musicstoreapi.dto.response.authDTO.AccessTokenResponse;
 import com.musicstore.musicstoreapi.dto.response.authDTO.LoginResponse;
 import com.musicstore.musicstoreapi.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +53,24 @@ public class AuthenticationController {
                 .success(true)
                 .message("Login success")
                 .data(null)
+                .path(httpServletRequest.getRequestURI())
+                .build();
+    }
+
+    @PostMapping("/refresh-token")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<AccessTokenResponse> refreshToken(
+            HttpServletRequest httpServletRequest,
+            @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+
+        AccessTokenResponse accessTokenResponse = authenticationService.refreshToken(refreshTokenRequest);
+
+        return ApiResponse.<AccessTokenResponse>builder()
+                .timestamp(Instant.now())
+                .statusCode(HttpStatus.OK.value())
+                .success(true)
+                .message("Success")
+                .data(accessTokenResponse)
                 .path(httpServletRequest.getRequestURI())
                 .build();
     }

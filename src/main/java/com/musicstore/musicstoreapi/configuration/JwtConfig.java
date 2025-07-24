@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Date;
 
 @Component
 public class JwtConfig {
@@ -30,7 +31,12 @@ public class JwtConfig {
         return Keys.hmacShaKeyFor((TokenType.ACCESS.equals(tokenType)) ? ACCESS_TOKEN_SECRET_KEY.getBytes() : REFRESH_TOKEN_SECRET_KEY.getBytes());
     }
 
-    public Long getExpiration(TokenType tokenType) {
-        return (TokenType.ACCESS.equals(tokenType)) ? ACCESS_TOKEN_EXPIRATION : REFRESH_TOKEN_EXPIRATION;
+    public Date getExpiration(TokenType tokenType) {
+        Date now = new Date();
+        if (TokenType.ACCESS.equals(tokenType)) {
+            return new Date(now.getTime() + this.ACCESS_TOKEN_EXPIRATION);
+        } else {
+            return new Date(now.getTime() + this.REFRESH_TOKEN_EXPIRATION);
+        }
     }
 }

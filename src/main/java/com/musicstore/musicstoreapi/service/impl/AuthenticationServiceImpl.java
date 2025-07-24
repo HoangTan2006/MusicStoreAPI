@@ -1,7 +1,9 @@
 package com.musicstore.musicstoreapi.service.impl;
 
 import com.musicstore.musicstoreapi.dto.request.authDTO.LoginRequest;
+import com.musicstore.musicstoreapi.dto.request.authDTO.RefreshTokenRequest;
 import com.musicstore.musicstoreapi.dto.request.authDTO.RegisterRequest;
+import com.musicstore.musicstoreapi.dto.response.authDTO.AccessTokenResponse;
 import com.musicstore.musicstoreapi.dto.response.authDTO.LoginResponse;
 import com.musicstore.musicstoreapi.entity.Role;
 import com.musicstore.musicstoreapi.entity.User;
@@ -12,6 +14,8 @@ import com.musicstore.musicstoreapi.repository.RoleRepository;
 import com.musicstore.musicstoreapi.repository.UserRepository;
 import com.musicstore.musicstoreapi.service.AuthenticationService;
 import com.musicstore.musicstoreapi.service.JwtService;
+import io.jsonwebtoken.Claims;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -68,5 +72,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
 
         userRepository.save(user);
+    }
+
+    @Override
+    public AccessTokenResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+        Claims parserToken = jwtService.parserToken(refreshTokenRequest.getRefreshToken(), TokenType.REFRESH);
+        String username = parserToken.getSubject();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        String accessToken = jwtService.generateToken(user, TokenType.ACCESS);
+        return new AccessTokenResponse(accessToken);
     }
 }

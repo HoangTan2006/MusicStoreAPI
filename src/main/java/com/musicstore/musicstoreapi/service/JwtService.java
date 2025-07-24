@@ -6,5 +6,5 @@ import io.jsonwebtoken.Claims;
 
 public interface JwtService {
     String generateToken(User user, TokenType tokenType);
-    Claims verifyToken(String token, TokenType tokenType);
+    Claims parserToken(String token, TokenType tokenType);
 }

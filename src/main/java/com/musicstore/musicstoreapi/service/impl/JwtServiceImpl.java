@@ -6,6 +6,7 @@ import com.musicstore.musicstoreapi.entity.User;
 import com.musicstore.musicstoreapi.entity.enums.TokenType;
 import com.musicstore.musicstoreapi.service.JwtService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,14 +29,14 @@ public class JwtServiceImpl implements JwtService {
                 .claim("email", user.getEmail())
                 .claim("roles", buildClaimRoles(user.getRoles()))
                 .issuedAt(new Date())
-                .expiration(new Date(new Date().getTime() + jwtConfig.getExpiration(tokenType)))
+                .expiration(jwtConfig.getExpiration(tokenType))
                 .issuer(jwtConfig.getISSUER())
                 .signWith(jwtConfig.getSecretKey(tokenType))
                 .compact();
     }
 
     @Override
-    public Claims verifyToken(String token, TokenType tokenType) {
+    public Claims parserToken(String token, TokenType tokenType) {
         return Jwts.parser()
                 .requireIssuer(jwtConfig.getISSUER())
                 .verifyWith(jwtConfig.getSecretKey(tokenType))
