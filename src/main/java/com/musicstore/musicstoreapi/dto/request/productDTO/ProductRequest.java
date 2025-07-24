@@ -5,6 +5,8 @@ import lombok.Getter;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.format.annotation.NumberFormat;
 
+import java.math.BigDecimal;
+
 @Getter
 public class ProductRequest {
     @NotBlank(message = "Name must not be blank")
@@ -16,7 +18,7 @@ public class ProductRequest {
     private String description;
 
     @NumberFormat
-    private Long price;
+    private BigDecimal price;
 
     @NumberFormat
     private Integer stockQuantity;

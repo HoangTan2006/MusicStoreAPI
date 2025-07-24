@@ -3,6 +3,8 @@ package com.musicstore.musicstoreapi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "payments")
 @Setter
@@ -16,7 +18,7 @@ public class Payment extends AbstractEntity<Long> {
     private Order order;
 
     @Column(name = "amount")
-    private Long amount;
+    private BigDecimal amount;
 
     @Column(name = "payment_method")
     private String paymentMethod;

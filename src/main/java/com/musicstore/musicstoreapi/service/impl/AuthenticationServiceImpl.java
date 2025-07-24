@@ -5,6 +5,7 @@ import com.musicstore.musicstoreapi.dto.request.authDTO.RefreshTokenRequest;
 import com.musicstore.musicstoreapi.dto.request.authDTO.RegisterRequest;
 import com.musicstore.musicstoreapi.dto.response.authDTO.AccessTokenResponse;
 import com.musicstore.musicstoreapi.dto.response.authDTO.LoginResponse;
+import com.musicstore.musicstoreapi.entity.Cart;
 import com.musicstore.musicstoreapi.entity.Role;
 import com.musicstore.musicstoreapi.entity.User;
 import com.musicstore.musicstoreapi.entity.enums.RoleType;
@@ -13,9 +14,11 @@ import com.musicstore.musicstoreapi.exception.UserRegistrationException;
 import com.musicstore.musicstoreapi.repository.RoleRepository;
 import com.musicstore.musicstoreapi.repository.UserRepository;
 import com.musicstore.musicstoreapi.service.AuthenticationService;
+import com.musicstore.musicstoreapi.service.CartService;
 import com.musicstore.musicstoreapi.service.JwtService;
 import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Service
@@ -55,6 +59,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public void registerUser(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getUsername())) throw new UserRegistrationException("Username already exists");
         if (userRepository.existsByEmail(registerRequest.getEmail())) throw new UserRegistrationException("Email already exists");
@@ -63,13 +68,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new UserRegistrationException("Role not found"));
 
         User user = User.builder()
-                .name(registerRequest.getName())
-                .email(registerRequest.getEmail())
-                .username(registerRequest.getUsername())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .roles(Set.of(role))
-                .isLock(false)
-                .build();
+                        .name(registerRequest.getName())
+                        .email(registerRequest.getEmail())
+                        .username(registerRequest.getUsername())
+                        .password(passwordEncoder.encode(registerRequest.getPassword()))
+                        .roles(Set.of(role))
+                        .isLock(false)
+                        .build();
+
+        //Only create a default cart when the user has just registered an account
+        Cart cart = new Cart(user, BigDecimal.ZERO, null);
+        user.setCart(cart);
 
         userRepository.save(user);
     }

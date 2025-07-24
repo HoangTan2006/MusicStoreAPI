@@ -3,6 +3,8 @@ package com.musicstore.musicstoreapi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "cart_items")
 @Setter
@@ -23,5 +25,5 @@ public class CartItem extends AbstractEntity<Long> {
     private Integer quantity;
 
     @Column(name = "price")
-    private Long price;
+    private BigDecimal price;
 }

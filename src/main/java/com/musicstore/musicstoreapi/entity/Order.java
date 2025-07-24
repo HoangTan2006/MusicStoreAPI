@@ -3,6 +3,7 @@ package com.musicstore.musicstoreapi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity
@@ -18,7 +19,7 @@ public class Order extends AbstractEntity<Long> {
     private User user;
 
     @Column(name = "total_amount")
-    private Long totalAmount;
+    private BigDecimal totalAmount;
 
     @Column(name = "address")
     private String address;

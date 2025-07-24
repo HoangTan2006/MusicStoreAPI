@@ -47,7 +47,7 @@ public class User extends AbstractEntity<Long> implements UserDetails {
     @OneToMany(mappedBy = "user")
     private Set<Order> orders;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
 
     @Override
