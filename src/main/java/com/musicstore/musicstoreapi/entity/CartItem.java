@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CartItem extends AbstractEntity<Long> {
     @ManyToOne
-    @JoinColumn(name = "card_id")
+    @JoinColumn(name = "cart_id")
     private Cart cart;
 
     @ManyToOne

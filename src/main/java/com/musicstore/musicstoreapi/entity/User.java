@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,10 +21,10 @@ public class User extends AbstractEntity<Long> implements UserDetails {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
     @Column(name = "password")
@@ -41,14 +42,14 @@ public class User extends AbstractEntity<Long> implements UserDetails {
     )
     private Set<Role> roles;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Address> addresses;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Address> addresses;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Order> orders;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Order> orders;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Cart cart;
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.MERGE)
+//    private Cart cart;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

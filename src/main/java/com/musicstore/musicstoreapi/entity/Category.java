@@ -6,6 +6,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,5 +21,5 @@ public class Category extends AbstractEntity<Integer> {
     private String name;
 
     @OneToMany(mappedBy = "category")
-    private Set<Product> products;
+    private List<Product> products;
 }

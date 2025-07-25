@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -39,9 +40,9 @@ public class Product extends AbstractEntity<Integer> {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "product")
-    private Set<CartItem> cartItem;
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<CartItem> cartItem;
 
-    @OneToMany(mappedBy = "product")
-    private Set<OrderDetail> orderDetail;
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<OrderDetail> orderDetail;
 }

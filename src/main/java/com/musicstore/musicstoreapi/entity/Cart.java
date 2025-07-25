@@ -3,8 +3,7 @@ package com.musicstore.musicstoreapi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "carts")
@@ -14,13 +13,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cart extends AbstractEntity<Long> {
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "total_amount")
-    private BigDecimal totalAmount;
-
-    @OneToMany(mappedBy = "cart")
-    private Set<CartItem> cartItems;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.PERSIST)
+    private List<CartItem> cartItems;
 }

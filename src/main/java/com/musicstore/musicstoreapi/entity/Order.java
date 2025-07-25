@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,7 +29,7 @@ public class Order extends AbstractEntity<Long> {
     private String status;
 
     @OneToMany(mappedBy = "order")
-    private Set<OrderDetail> orderDetail;
+    private List<OrderDetail> orderDetail;
 
     @OneToOne(mappedBy = "order")
     private Payment payment;

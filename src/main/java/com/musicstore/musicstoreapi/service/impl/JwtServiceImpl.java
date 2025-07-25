@@ -41,7 +41,7 @@ public class JwtServiceImpl implements JwtService {
                 .requireIssuer(jwtConfig.getISSUER())
                 .verifyWith(jwtConfig.getSecretKey(tokenType))
                 .build()
-                .parseClaimsJws(token)
+                .parseSignedClaims(token)
                 .getPayload();
     }
 

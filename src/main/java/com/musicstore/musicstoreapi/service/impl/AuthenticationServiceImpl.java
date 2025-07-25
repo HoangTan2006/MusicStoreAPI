@@ -11,6 +11,7 @@ import com.musicstore.musicstoreapi.entity.User;
 import com.musicstore.musicstoreapi.entity.enums.RoleType;
 import com.musicstore.musicstoreapi.entity.enums.TokenType;
 import com.musicstore.musicstoreapi.exception.UserRegistrationException;
+import com.musicstore.musicstoreapi.repository.CartRepository;
 import com.musicstore.musicstoreapi.repository.RoleRepository;
 import com.musicstore.musicstoreapi.repository.UserRepository;
 import com.musicstore.musicstoreapi.service.AuthenticationService;
@@ -37,6 +38,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final CartRepository cartRepository;
 
     @Override
     public LoginResponse authenticateUser(LoginRequest loginRequest) {
@@ -76,11 +78,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .isLock(false)
                         .build();
 
-        //Only create a default cart when the user has just registered an account
-        Cart cart = new Cart(user, BigDecimal.ZERO, null);
-        user.setCart(cart);
+        user = userRepository.save(user);
 
-        userRepository.save(user);
+        //Only create a default cart when the user has just registered an account
+        Cart cart = new Cart(user, null);
+        cartRepository.save(cart);
+//        user.setCart(cart);
     }
 
     @Override
