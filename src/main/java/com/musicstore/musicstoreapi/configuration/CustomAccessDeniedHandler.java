@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Date;
 
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
@@ -23,15 +24,15 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpStatus.FORBIDDEN.value());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now())
+                .timestamp(new Date())
                 .statusCode(HttpStatus.FORBIDDEN.value())
                 .error(HttpStatus.FORBIDDEN.name())
                 .path(request.getRequestURI())
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.setDateFormat(new StdDateFormat());
+//        mapper.registerModule(new JavaTimeModule());
+//        mapper.setDateFormat(new StdDateFormat());
 
         response.getWriter().write(mapper.writeValueAsString(errorResponse));
     }

@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.Date;
 
 @MappedSuperclass
 @Setter
@@ -18,9 +19,9 @@ public abstract class AbstractEntity<T> {
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private Instant updatedAt;
+    private Date updatedAt;
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private Instant createdAt;
+    private Date createdAt;
 }

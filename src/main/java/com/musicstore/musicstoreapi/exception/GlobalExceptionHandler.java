@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
+import java.util.Date;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException exception) {
 
         return ErrorResponse.builder()
-                .timestamp(Instant.now())
+                .timestamp(new Date())
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .error(exception.getMessage())
                 .path(request.getRequestURI())
