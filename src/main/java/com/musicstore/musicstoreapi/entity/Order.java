@@ -28,6 +28,6 @@ public class Order extends AbstractEntity<Long> {
     @Column(name = "status")
     private String status;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private List<OrderDetail> orderDetail;
 }

@@ -46,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
         Product product = productRepository.findByIdAndIsDeletedFalse(buyNowOrderRequest.getProductId())
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
+        //Convert address to json
         Address address = user.getAddresses()
                 .stream()
                 .filter(a -> a.getId().equals(buyNowOrderRequest.getAddressId()))
@@ -54,8 +55,8 @@ public class OrderServiceImpl implements OrderService {
 
         String addressJson = address.toJson();
 
-        BigDecimal quantity = BigDecimal.valueOf(buyNowOrderRequest.getQuantity());
-        BigDecimal totalAmount = product.getPrice().add(quantity);
+        BigDecimal quantityOrder = BigDecimal.valueOf(buyNowOrderRequest.getQuantity());
+        BigDecimal totalAmount = product.getPrice().multiply(quantityOrder);
 
         Order order = Order.builder()
                 .user(user)
