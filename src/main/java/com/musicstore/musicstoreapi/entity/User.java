@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -17,7 +18,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends AbstractEntity<Long> implements UserDetails {
+public class User extends AbstractEntity<Long> implements CustomUserDetails {
     @Column(name = "name")
     private String name;
 
@@ -33,7 +34,7 @@ public class User extends AbstractEntity<Long> implements UserDetails {
     @Column(name = "is_lock")
     private Boolean isLock;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

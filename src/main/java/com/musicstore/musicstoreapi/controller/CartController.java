@@ -6,6 +6,8 @@ import com.musicstore.musicstoreapi.dto.response.ApiResponse;
 import com.musicstore.musicstoreapi.dto.response.cartDTO.CartItemResponse;
 import com.musicstore.musicstoreapi.dto.response.cartDTO.CartResponse;
 import com.musicstore.musicstoreapi.service.CartService;
+import com.musicstore.musicstoreapi.utils.SecurityUtils;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +30,11 @@ public class CartController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<CartResponse> getCard(
-            HttpServletRequest httpServletRequest,
-            Authentication authentication) {
+            HttpServletRequest httpServletRequest) {
 
-        CartResponse cartResponse = cartService.getCart((Long) authentication.getPrincipal());
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        CartResponse cartResponse = cartService.getCart(currentUserId);
 
         return ApiResponse.<CartResponse>builder()
                 .timestamp(Instant.now())
@@ -48,10 +51,11 @@ public class CartController {
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CartItemResponse> addCardItem(
             HttpServletRequest httpServletRequest,
-            Authentication authentication,
             @RequestBody @Valid CartItemRequest cartItemRequest) {
 
-        CartItemResponse cartItemResponse = cartService.addCartItem((Long) authentication.getPrincipal(), cartItemRequest);
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        CartItemResponse cartItemResponse = cartService.addCartItem(currentUserId, cartItemRequest);
 
         return ApiResponse.<CartItemResponse>builder()
                 .timestamp(Instant.now())
@@ -68,11 +72,12 @@ public class CartController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<CartItemResponse> updateQuantityForItem(
             HttpServletRequest httpServletRequest,
-            Authentication authentication,
             @PathVariable(name = "id") Long id,
             @RequestBody @Valid UpdateQuantityCartItemRequest updateQuantityCartItemRequest) {
 
-        CartItemResponse cartItemResponse = cartService.updateQuantityForItem((Long) authentication.getPrincipal(), id, updateQuantityCartItemRequest);
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        CartItemResponse cartItemResponse = cartService.updateQuantityForItem(currentUserId, id, updateQuantityCartItemRequest);
 
         return ApiResponse.<CartItemResponse>builder()
                 .timestamp(Instant.now())
@@ -89,10 +94,11 @@ public class CartController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<Void> deleteCartItem(
             HttpServletRequest httpServletRequest,
-            Authentication authentication,
             @PathVariable(name = "id") Long id) {
 
-        cartService.deleteItem((Long) authentication.getPrincipal(), id);
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        cartService.deleteItem(currentUserId, id);
 
         return ApiResponse.<Void>builder()
                 .timestamp(Instant.now())

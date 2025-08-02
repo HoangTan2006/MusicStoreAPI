@@ -23,7 +23,4 @@ public class CartItem extends AbstractEntity<Long> {
 
     @Column(name = "quantity")
     private Integer quantity;
-
-    @Column(name = "price")
-    private BigDecimal price;
 }

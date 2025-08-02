@@ -5,6 +5,7 @@ import com.musicstore.musicstoreapi.dto.response.ApiResponse;
 import com.musicstore.musicstoreapi.dto.response.cartDTO.CartResponse;
 import com.musicstore.musicstoreapi.dto.response.orderDTO.OrderResponse;
 import com.musicstore.musicstoreapi.service.OrderService;
+import com.musicstore.musicstoreapi.utils.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +28,12 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<OrderResponse> createOrderFromBuyNow(
             HttpServletRequest httpServletRequest,
-            Authentication authentication,
             @RequestBody @Valid BuyNowOrderRequest buyNowOrderRequest) {
 
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
         OrderResponse orderResponse = orderService.createOrderFromBuyNow(
-                (Long) authentication.getPrincipal(),
+                currentUserId,
                 buyNowOrderRequest);
 
         return ApiResponse.<OrderResponse>builder()

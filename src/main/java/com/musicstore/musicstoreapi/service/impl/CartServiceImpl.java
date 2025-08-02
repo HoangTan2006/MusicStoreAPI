@@ -7,6 +7,7 @@ import com.musicstore.musicstoreapi.dto.response.cartDTO.CartResponse;
 import com.musicstore.musicstoreapi.entity.Cart;
 import com.musicstore.musicstoreapi.entity.CartItem;
 import com.musicstore.musicstoreapi.entity.Product;
+import com.musicstore.musicstoreapi.entity.User;
 import com.musicstore.musicstoreapi.mapper.CartItemMapper;
 import com.musicstore.musicstoreapi.repository.CartItemRepository;
 import com.musicstore.musicstoreapi.repository.CartRepository;
@@ -30,6 +31,15 @@ public class CartServiceImpl implements CartService {
     private final CartItemMapper cartItemMapper;
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository;
+
+    @Override
+    public void createCart(User user) {
+        Cart cart = Cart.builder()
+                .user(user)
+                .build();
+
+        cartRepository.save(cart);
+    }
 
     @Override
     public CartResponse getCart(Long userId) {
@@ -66,7 +76,7 @@ public class CartServiceImpl implements CartService {
                 .cart(cart)
                 .product(product)
                 .quantity(cartItemRequest.getQuantity())
-                .price(price)
+//                .price(price)
                 .build();
 
         return cartItemMapper.toCartItemDTO(
@@ -88,7 +98,7 @@ public class CartServiceImpl implements CartService {
                 .multiply(BigDecimal.valueOf(quantityRequest.getQuantity()));
 
         cartItem.setQuantity(quantityRequest.getQuantity());
-        cartItem.setPrice(price);
+//        cartItem.setPrice(price);
 
         return cartItemMapper.toCartItemDTO(
                 cartItemRepository.save(cartItem));

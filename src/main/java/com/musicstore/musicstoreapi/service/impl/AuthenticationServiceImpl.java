@@ -17,6 +17,7 @@ import com.musicstore.musicstoreapi.repository.UserRepository;
 import com.musicstore.musicstoreapi.service.AuthenticationService;
 import com.musicstore.musicstoreapi.service.CartService;
 import com.musicstore.musicstoreapi.service.JwtService;
+import com.musicstore.musicstoreapi.service.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -39,6 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final CartRepository cartRepository;
+    private final UserService userService;
 
     @Override
     public LoginResponse authenticateUser(LoginRequest loginRequest) {
@@ -63,27 +65,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public void registerUser(RegisterRequest registerRequest) {
-        if (userRepository.existsByUsername(registerRequest.getUsername())) throw new UserRegistrationException("Username already exists");
-        if (userRepository.existsByEmail(registerRequest.getEmail())) throw new UserRegistrationException("Email already exists");
-
-        Role role = roleRepository.findByName(RoleType.ROLE_USER.name())
-                .orElseThrow(() -> new UserRegistrationException("Role not found"));
-
-        User user = User.builder()
-                        .name(registerRequest.getName())
-                        .email(registerRequest.getEmail())
-                        .username(registerRequest.getUsername())
-                        .password(passwordEncoder.encode(registerRequest.getPassword()))
-                        .roles(Set.of(role))
-                        .isLock(false)
-                        .build();
-
-        user = userRepository.save(user);
-
-        //Only create a default cart when the user has just registered an account
-        Cart cart = new Cart(user, null);
-        cartRepository.save(cart);
-//        user.setCart(cart);
+        userService.createUser(registerRequest);
     }
 
     @Override
