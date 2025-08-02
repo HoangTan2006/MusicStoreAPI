@@ -19,7 +19,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,18 +42,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse getCart(Long userId) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Cart not found"));
 
-        List<CartItemResponse> cartItemResponses = cart.getCartItems()
-                .stream()
-                .map(cartItemMapper::toCartItemDTO)
-                .toList();
+        List<CartItemResponse> cartItemResponses = cartItemRepository.findAllCartItemWithProductPriceByUserId(userId);
 
-        BigDecimal totalAmount = cartItemResponses
-                        .stream()
-                        .map(CartItemResponse::getPrice)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalAmount = calculateTotalAmount(cartItemResponses);
 
         return CartResponse.builder()
                 .cart(cartItemResponses)
@@ -118,5 +109,19 @@ public class CartServiceImpl implements CartService {
         cart.getCartItems().remove(cartItem);
 
         cartItemRepository.delete(cartItem);
+    }
+
+    private BigDecimal calculateTotalAmount(List<CartItemResponse> cartItemResponses) {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        if (cartItemResponses.isEmpty()) return BigDecimal.ZERO;
+
+        for (CartItemResponse cartItem : cartItemResponses) {
+            totalAmount = totalAmount.add(
+                    BigDecimal.valueOf(cartItem.getQuantity()).multiply(cartItem.getPrice())
+            );
+        }
+
+        return totalAmount;
     }
 }
