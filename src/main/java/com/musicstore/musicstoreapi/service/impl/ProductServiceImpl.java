@@ -7,6 +7,7 @@ import com.musicstore.musicstoreapi.dto.response.productDTO.ProductDetailRespons
 import com.musicstore.musicstoreapi.entity.Category;
 import com.musicstore.musicstoreapi.entity.Product;
 import com.musicstore.musicstoreapi.mapper.ProductMapper;
+import com.musicstore.musicstoreapi.repository.CartItemRepository;
 import com.musicstore.musicstoreapi.repository.CategoryRepository;
 import com.musicstore.musicstoreapi.repository.ProductRepository;
 import com.musicstore.musicstoreapi.service.ProductService;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.InvalidParameterException;
 import java.util.regex.Matcher;
@@ -28,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
+    private final CartItemRepository cartItemRepository;
 
     @Override
     public void CreateProduct(ProductRequest productRequest) {
@@ -50,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDetailResponse getProduct(Integer id) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
         return productMapper.toProductDetailDTO(product);
     }
@@ -86,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void updateProduct(Integer id, ProductUpdateRequest productUpdate) {
         if (productUpdate.getPrice() == null && productUpdate.getStockQuantity() == null) return;
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
         if (productUpdate.getPrice() != null) product.setPrice(productUpdate.getPrice());
@@ -96,12 +99,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProduct(Integer id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
         product.setIsDeleted(true);
-
         productRepository.save(product);
+
+        cartItemRepository.deleteAllByProduct_Id(id);
     }
 }

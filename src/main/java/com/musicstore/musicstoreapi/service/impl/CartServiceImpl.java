@@ -61,7 +61,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Cart not found"));
 
-        Product product = productRepository.findById(cartItemRequest.getProductId())
+        Product product = productRepository.findByIdAndIsDeletedFalse(cartItemRequest.getProductId())
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
         CartItem cartItem = CartItem.builder()
