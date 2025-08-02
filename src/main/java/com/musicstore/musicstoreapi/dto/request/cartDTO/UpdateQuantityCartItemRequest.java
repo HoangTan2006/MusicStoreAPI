@@ -6,5 +6,8 @@ import org.springframework.format.annotation.NumberFormat;
 @Getter
 public class UpdateQuantityCartItemRequest {
     @NumberFormat
+    private Long id;
+
+    @NumberFormat
     private Integer quantity;
 }

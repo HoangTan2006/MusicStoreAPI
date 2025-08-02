@@ -67,17 +67,16 @@ public class CartController {
                 .build();
     }
 
-    @PatchMapping("/me/{id}")
+    @PatchMapping("/me")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<CartItemResponse> updateQuantityForItem(
             HttpServletRequest httpServletRequest,
-            @PathVariable(name = "id") Long id,
             @RequestBody @Valid UpdateQuantityCartItemRequest updateQuantityCartItemRequest) {
 
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
-        CartItemResponse cartItemResponse = cartService.updateQuantityForItem(currentUserId, id, updateQuantityCartItemRequest);
+        CartItemResponse cartItemResponse = cartService.updateQuantityForItem(currentUserId, updateQuantityCartItemRequest);
 
         return ApiResponse.<CartItemResponse>builder()
                 .timestamp(Instant.now())

@@ -27,7 +27,7 @@ public class JwtServiceImpl implements JwtService {
                 .subject(user.getUsername())
                 .claim("userId", user.getId())
                 .claim("email", user.getEmail())
-                .claim("roles", buildClaimRoles(user.getRoles()))
+//                .claim("roles", buildClaimRoles(user.getRoles()))
                 .issuedAt(new Date())
                 .expiration(jwtConfig.getExpiration(tokenType))
                 .issuer(jwtConfig.getISSUER())
@@ -44,11 +44,10 @@ public class JwtServiceImpl implements JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-
-    private List<String> buildClaimRoles(Set<Role> roles) {
-        return roles
-                .stream()
-                .map(Role::getName)
-                .toList();
-    }
+//    private List<String> buildClaimRoles(Set<Role> roles) {
+//        return roles
+//                .stream()
+//                .map(Role::getName)
+//                .toList();
+//    }
 }

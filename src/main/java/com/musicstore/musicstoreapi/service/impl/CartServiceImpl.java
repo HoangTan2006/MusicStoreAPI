@@ -12,7 +12,9 @@ import com.musicstore.musicstoreapi.mapper.CartItemMapper;
 import com.musicstore.musicstoreapi.repository.CartItemRepository;
 import com.musicstore.musicstoreapi.repository.CartRepository;
 import com.musicstore.musicstoreapi.repository.ProductRepository;
+import com.musicstore.musicstoreapi.service.CartItemService;
 import com.musicstore.musicstoreapi.service.CartService;
+import com.musicstore.musicstoreapi.utils.BigDecimalUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,6 +32,7 @@ public class CartServiceImpl implements CartService {
     private final CartItemMapper cartItemMapper;
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository;
+    private final CartItemService cartItemService;
 
     @Override
     public void createCart(User user) {
@@ -61,13 +64,10 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(cartItemRequest.getProductId())
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
-        BigDecimal price = product.getPrice().multiply(BigDecimal.valueOf(cartItemRequest.getQuantity()));
-
         CartItem cartItem = CartItem.builder()
                 .cart(cart)
                 .product(product)
                 .quantity(cartItemRequest.getQuantity())
-//                .price(price)
                 .build();
 
         return cartItemMapper.toCartItemDTO(
@@ -75,53 +75,28 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartItemResponse updateQuantityForItem(Long userId, Long cartItemId, UpdateQuantityCartItemRequest quantityRequest) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Cart not found"));
-
-        CartItem cartItem = cart.getCartItems()
-                .stream()
-                .filter(item -> Objects.equals(item.getId(), cartItemId))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("CartItem not found"));
-
-        BigDecimal price = cartItem.getProduct().getPrice()
-                .multiply(BigDecimal.valueOf(quantityRequest.getQuantity()));
-
-        cartItem.setQuantity(quantityRequest.getQuantity());
-//        cartItem.setPrice(price);
-
-        return cartItemMapper.toCartItemDTO(
-                cartItemRepository.save(cartItem));
+    public CartItemResponse updateQuantityForItem(Long userId, UpdateQuantityCartItemRequest updateCartItem) {
+       return cartItemService.updateQuantity(userId, updateCartItem);
     }
 
     @Override
     public void deleteItem(Long userId, Long cartItemId) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Cart not found"));
-
-        CartItem cartItem = cart.getCartItems()
-                .stream()
-                .filter(item -> Objects.equals(item.getId(), cartItemId))
-                .findFirst()
-                .orElseThrow(() -> new AccessDeniedException("Access denied"));
-
-        cart.getCartItems().remove(cartItem);
-
-        cartItemRepository.delete(cartItem);
+        cartItemService.deleteCartItem(userId, cartItemId);
     }
 
     private BigDecimal calculateTotalAmount(List<CartItemResponse> cartItemResponses) {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        if (cartItemResponses.isEmpty()) return BigDecimal.ZERO;
-
-        for (CartItemResponse cartItem : cartItemResponses) {
-            totalAmount = totalAmount.add(
-                    BigDecimal.valueOf(cartItem.getQuantity()).multiply(cartItem.getPrice())
-            );
+        if (cartItemResponses.isEmpty()) {
+            return totalAmount;
         }
 
+        for (CartItemResponse cartItem : cartItemResponses) {
+            totalAmount = BigDecimalUtils.add(
+                    totalAmount,
+                    cartItem.getPrice()
+            );
+        }
         return totalAmount;
     }
 }

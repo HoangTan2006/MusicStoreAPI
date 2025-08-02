@@ -10,6 +10,6 @@ public interface CartService {
     void createCart(User user);
     CartResponse getCart(Long userId);
     CartItemResponse addCartItem(Long userId, CartItemRequest cartItemRequest);
-    CartItemResponse updateQuantityForItem(Long userId, Long cartItemId, UpdateQuantityCartItemRequest quantityRequest);
+    CartItemResponse updateQuantityForItem(Long userId, UpdateQuantityCartItemRequest updateCartItem);
     void deleteItem(Long userId, Long cartItemId);
 }
