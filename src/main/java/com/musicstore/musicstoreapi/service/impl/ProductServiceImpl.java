@@ -10,9 +10,11 @@ import com.musicstore.musicstoreapi.mapper.ProductMapper;
 import com.musicstore.musicstoreapi.repository.CartItemRepository;
 import com.musicstore.musicstoreapi.repository.CategoryRepository;
 import com.musicstore.musicstoreapi.repository.ProductRepository;
+import com.musicstore.musicstoreapi.service.CartItemService;
 import com.musicstore.musicstoreapi.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,16 +26,17 @@ import java.security.InvalidParameterException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
-    private final CartItemRepository cartItemRepository;
+    private final CartItemService cartItemService;
 
     @Override
-    public void CreateProduct(ProductRequest productRequest) {
+    public void createProduct(ProductRequest productRequest) {
         Category category = categoryRepository.findById(productRequest.getCategoryId())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found"));
 
@@ -53,8 +56,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDetailResponse getProduct(Integer id) {
-        Product product = productRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        Product product = findProductById(id);
         return productMapper.toProductDetailDTO(product);
     }
 
@@ -74,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
             pageable = PageRequest.of(page, size);
         }
 
-        Page<Product> products = productRepository.findAllByIsDeletedFalse(pageable);
+        Page<Product> products = findAllProduct(pageable);
         return ListProductResponse.builder()
                 .products(
                         products.getContent()
@@ -89,8 +91,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void updateProduct(Integer id, ProductUpdateRequest productUpdate) {
         if (productUpdate.getPrice() == null && productUpdate.getStockQuantity() == null) return;
-        Product product = productRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        Product product = findProductById(id);
 
         if (productUpdate.getPrice() != null) product.setPrice(productUpdate.getPrice());
         if (productUpdate.getStockQuantity() != null) product.setStockQuantity(productUpdate.getStockQuantity());
@@ -100,13 +101,24 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void deleteProduct(Integer id) {
+    public void softDeleteProduct(Integer id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
         product.setIsDeleted(true);
         productRepository.save(product);
 
-        cartItemRepository.deleteAllByProduct_Id(id);
+        cartItemService.deleteCartItemByProductId(id);
     }
+
+    //Check soft delete
+    private Product findProductById(Integer id) {
+        return productRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+    }
+
+    private Page<Product> findAllProduct(Pageable pageable) {
+        return productRepository.findAllByIsDeletedFalse(pageable);
+    }
+    //
 }

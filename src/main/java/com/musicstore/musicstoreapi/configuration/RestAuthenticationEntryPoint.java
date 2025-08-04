@@ -1,8 +1,6 @@
 package com.musicstore.musicstoreapi.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.musicstore.musicstoreapi.dto.response.ErrorResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +11,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.Date;
 
 @Component
@@ -31,8 +28,6 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
-//        mapper.registerModule(new JavaTimeModule());
-//        mapper.setDateFormat(new StdDateFormat());
 
         response.getWriter().write(mapper.writeValueAsString(errorResponse));
     }

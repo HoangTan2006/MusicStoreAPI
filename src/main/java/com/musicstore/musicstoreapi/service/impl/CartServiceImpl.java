@@ -17,7 +17,6 @@ import com.musicstore.musicstoreapi.service.CartService;
 import com.musicstore.musicstoreapi.utils.BigDecimalUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -80,7 +79,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void deleteItem(Long userId, Long cartItemId) {
+    public void deleteCartItem(Long userId, Long cartItemId) {
         cartItemService.deleteCartItem(userId, cartItemId);
     }
 

@@ -31,8 +31,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
-//        mapper.registerModule(new JavaTimeModule());
-//        mapper.setDateFormat(new StdDateFormat());
 
         response.getWriter().write(mapper.writeValueAsString(errorResponse));
     }

@@ -1,20 +1,15 @@
 package com.musicstore.musicstoreapi.service.impl;
 
 import com.musicstore.musicstoreapi.configuration.JwtConfig;
-import com.musicstore.musicstoreapi.entity.Role;
-import com.musicstore.musicstoreapi.entity.User;
+import com.musicstore.musicstoreapi.entity.CustomUserDetails;
 import com.musicstore.musicstoreapi.entity.enums.TokenType;
 import com.musicstore.musicstoreapi.service.JwtService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +17,11 @@ public class JwtServiceImpl implements JwtService {
     private final JwtConfig jwtConfig;
 
     @Override
-    public String generateToken(User user, TokenType tokenType) {
+    public String generateToken(CustomUserDetails userDetails, TokenType tokenType) {
         return Jwts.builder()
-                .subject(user.getUsername())
-                .claim("userId", user.getId())
-                .claim("email", user.getEmail())
+                .subject(userDetails.getUsername())
+                .claim("userId", userDetails.getId())
+                .claim("email", userDetails.getEmail())
 //                .claim("roles", buildClaimRoles(user.getRoles()))
                 .issuedAt(new Date())
                 .expiration(jwtConfig.getExpiration(tokenType))

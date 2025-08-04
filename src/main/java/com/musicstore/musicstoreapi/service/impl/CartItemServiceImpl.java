@@ -35,4 +35,9 @@ public class CartItemServiceImpl implements CartItemService {
             cartItemRepository.deleteById(cartItemId);
         } else throw new AccessDeniedException("Access denied");
     }
+
+    @Override
+    public void deleteCartItemByProductId(Integer productId) {
+        cartItemRepository.deleteAllByProduct_Id(productId);
+    }
 }

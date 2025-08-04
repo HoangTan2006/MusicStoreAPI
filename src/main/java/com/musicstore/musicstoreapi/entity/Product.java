@@ -36,7 +36,7 @@ public class Product extends AbstractEntity<Integer> {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 

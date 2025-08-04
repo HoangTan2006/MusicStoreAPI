@@ -67,7 +67,7 @@ public class ProductController {
             HttpServletRequest httpServletRequest,
             @RequestBody @Valid ProductRequest productRequest) {
 
-        productService.CreateProduct(productRequest);
+        productService.createProduct(productRequest);
 
         return ApiResponse.<Void>builder()
                 .timestamp(Instant.now())
@@ -104,7 +104,7 @@ public class ProductController {
             HttpServletRequest httpServletRequest,
             @PathVariable(name = "id") Integer id) {
 
-        productService.deleteProduct(id);
+        productService.softDeleteProduct(id);
 
         return ApiResponse.<Void>builder()
                 .timestamp(Instant.now())

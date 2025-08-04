@@ -6,9 +6,9 @@ import com.musicstore.musicstoreapi.dto.response.productDTO.ListProductResponse;
 import com.musicstore.musicstoreapi.dto.response.productDTO.ProductDetailResponse;
 
 public interface ProductService {
-    void CreateProduct(ProductRequest productRequest);
+    void createProduct(ProductRequest productRequest);
     ProductDetailResponse getProduct(Integer id);
     ListProductResponse getProducts(Integer page, Integer size, String sort);
     void updateProduct(Integer id, ProductUpdateRequest productUpdate);
-    void deleteProduct(Integer id);
+    void softDeleteProduct(Integer id);
 }

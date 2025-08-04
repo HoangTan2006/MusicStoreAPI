@@ -7,17 +7,13 @@ import com.musicstore.musicstoreapi.dto.response.cartDTO.CartItemResponse;
 import com.musicstore.musicstoreapi.dto.response.cartDTO.CartResponse;
 import com.musicstore.musicstoreapi.service.CartService;
 import com.musicstore.musicstoreapi.utils.SecurityUtils;
-import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.time.Instant;
 
 @RestController
@@ -97,7 +93,7 @@ public class CartController {
 
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
-        cartService.deleteItem(currentUserId, id);
+        cartService.deleteCartItem(currentUserId, id);
 
         return ApiResponse.<Void>builder()
                 .timestamp(Instant.now())
