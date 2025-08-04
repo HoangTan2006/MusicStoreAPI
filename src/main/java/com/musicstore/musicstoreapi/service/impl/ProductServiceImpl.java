@@ -12,9 +12,12 @@ import com.musicstore.musicstoreapi.repository.CategoryRepository;
 import com.musicstore.musicstoreapi.repository.ProductRepository;
 import com.musicstore.musicstoreapi.service.CartItemService;
 import com.musicstore.musicstoreapi.service.ProductService;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +25,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.security.InvalidParameterException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -62,19 +70,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ListProductResponse getProducts(Integer page, Integer size, String sort) {
-        Pageable pageable;
-        if (sort != null) {
-            Pattern pattern = Pattern.compile("^[a-zA-Z0-9_]+,(asc|desc)$");
-            Matcher matcher = pattern.matcher(sort);
-            if (!matcher.matches()) throw new InvalidParameterException("Invalid sort parameter format. Expected format: field,asc|desc");
-
-            String[] sortParam = sort.split(",");
-            Sort.Direction direction = (sortParam[1].equals("asc")) ? Sort.Direction.ASC : Sort.Direction.DESC;
-
-            pageable = PageRequest.of(page, size, Sort.by(direction, sortParam[0]));
-        } else {
-            pageable = PageRequest.of(page, size);
-        }
+        Pageable pageable = buildPageable(page, size, sort);
 
         Page<Product> products = findAllProduct(pageable);
         return ListProductResponse.builder()
@@ -117,8 +113,31 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 
+    //check soft delete
     private Page<Product> findAllProduct(Pageable pageable) {
         return productRepository.findAllByIsDeletedFalse(pageable);
     }
-    //
+
+    private Pageable buildPageable(Integer page, Integer size, String sort) {
+        Pageable pageable;
+        if (sort != null) {
+            Pattern pattern = Pattern.compile("^[a-zA-Z0-9_]+,(asc|desc)$");
+            Matcher matcher = pattern.matcher(sort);
+
+            if (!matcher.matches()) {
+                throw new InvalidParameterException("Invalid sort parameter format. Expected format: fieldName,asc|desc");
+            }
+
+            int commaIndex = sort.indexOf(",");
+            String sortField = sort.substring(0, commaIndex);
+            String sortDirection = sort.substring(commaIndex + 1);
+
+            Sort.Direction direction = (sortDirection.equals("asc")) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+            pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+        } else {
+            pageable = PageRequest.of(page, size);
+        }
+        return pageable;
+    }
 }
