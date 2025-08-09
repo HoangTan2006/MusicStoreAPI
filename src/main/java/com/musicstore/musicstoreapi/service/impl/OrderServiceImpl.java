@@ -6,15 +6,13 @@ import com.musicstore.musicstoreapi.dto.response.orderDTO.OrderResponse;
 import com.musicstore.musicstoreapi.entity.*;
 import com.musicstore.musicstoreapi.entity.enums.OrderStatus;
 import com.musicstore.musicstoreapi.mapper.OrderMapper;
-import com.musicstore.musicstoreapi.repository.AddressRepository;
 import com.musicstore.musicstoreapi.repository.OrderRepository;
 import com.musicstore.musicstoreapi.repository.ProductRepository;
 import com.musicstore.musicstoreapi.repository.UserRepository;
 import com.musicstore.musicstoreapi.service.OrderService;
-import com.musicstore.musicstoreapi.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -29,11 +27,9 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final OrderMapper orderMapper;
-    private final AddressRepository addressRepository;
-    private final ProductService productService;
     private final OrderRepository orderRepository;
 
-    @SneakyThrows
+    @Transactional
     @Override
     public OrderResponse createOrderFromBuyNow(Long userId, BuyNowOrderRequest buyNowOrderRequest) {
         User user = userRepository.findById(userId)
@@ -53,6 +49,9 @@ public class OrderServiceImpl implements OrderService {
 
         BigDecimal quantityOrder = BigDecimal.valueOf(buyNowOrderRequest.getQuantity());
         BigDecimal totalAmount = product.getPrice().multiply(quantityOrder);
+
+        product.setStockQuantity(product.getStockQuantity() - buyNowOrderRequest.getQuantity());
+        productRepository.save(product);
 
         Order order = Order.builder()
                 .user(user)
